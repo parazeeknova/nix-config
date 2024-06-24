@@ -14,17 +14,17 @@
 
       # --- SYSTEM SETTINGS --- #
       systemSettings = {
-      	hostname = "nixpewpew"; # hostname
+      	hostname = "nixgoesbrrr"; # hostname
       	system = "x86_64-linux"; # system arch
       	timezone = "Asia/Kolkata"; # select timezone
       	locale = "en_IN"; # select locale 
       };
 
       # --- USER SETTINGS --- #
-      userSettings = rec {
+      userSettings = {
       username = "pewpew"; # username 
       name = "parazeeknova"; # name/identifier
-      dotfilesDir = "~/.dotfiles"; # absolute path of the local repo 
+      dotfilesDir = "~/nix-config"; # absolute path of the local repo 
       };
       
       # Package repository
@@ -34,7 +34,7 @@
       nixosConfigurations = {
         ${systemSettings.hostname} = lib.nixosSystem {
           system = systemSettings.system;
-          modules = [ ./configuration.nix ];
+          modules = [ ./user/config.nix ];
           specialArgs = {
             # pass config variables form above
             inherit userSettings;
@@ -47,13 +47,17 @@
       homeConfigurations = {
         ${userSettings.username} = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          modules = [ ./home.nix ];
+          modules = [ ./user/home.nix ];
           extraSpecialArgs = {
             # pass config variables from above
             inherit userSettings;
             inherit systemSettings;
 	    inherit pkgs-unstable;
           };
+	  home-manager.useGlobalPkgs = true;
+	  home-manager.useUserPackages = true;
+	  home-manager.backupFileExtension = "backup";
+	  home-manager.users.${userSettings.username} = import ./user/home.nix;
         };
       };
     };
