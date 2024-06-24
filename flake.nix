@@ -6,9 +6,17 @@
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
     home-manager.url = "github:nix-community/home-manager/release-24.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Stylix
+    stylix.url = "github:danth/stylix";
+    fine-cmdline = {
+      url = "github:VonHeikemen/fine-cmdline.nvim";
+      flake = false;
+    };
+
   };
 
-  outputs = { self, nixpkgs,nixpkgs-unstable, home-manager, ...}: 
+  outputs = { self, nixpkgs,nixpkgs-unstable, home-manager, stylix,  ...}: 
     let 
       lib = nixpkgs.lib;
 
@@ -34,7 +42,7 @@
       nixosConfigurations = {
         ${systemSettings.hostname} = lib.nixosSystem {
           system = systemSettings.system;
-          modules = [ ./user/config.nix ];
+          modules = [ stylix.nixosModules.stylix ./user/config.nix ];
           specialArgs = {
             # pass config variables form above
             inherit userSettings;
@@ -47,7 +55,7 @@
       homeConfigurations = {
         ${userSettings.username} = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          modules = [ ./user/home.nix ];
+          modules = [ stylix.homeManagerModules.stylix ./user/home.nix ];
           extraSpecialArgs = {
             # pass config variables from above
             inherit userSettings;
